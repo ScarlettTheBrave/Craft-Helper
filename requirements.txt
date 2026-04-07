@@ -1,0 +1,7 @@
+psycopg2-binary
+redis
+sqlalchemy
+requests
+pandas
+PySide6
+python-dotenv
