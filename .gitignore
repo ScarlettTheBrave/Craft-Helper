@@ -1,0 +1,20 @@
+# Секреты
+.env
+
+# Виртуальные окружения
+venv/
+.venv/
+
+# Кэш Python
+__pycache__/
+*.pyc
+
+# Сборки PyInstaller
+dist/
+build/
+*.spec
+
+# Архивы
+*.7z
+*.zip
+*.rar

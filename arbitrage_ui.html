@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root { --bg: #0d1117; --panel: #111419; --border: #21262d; --text: #e6edf3; --muted: #8b949e; --accent: #8957e5; --win: #3fb950; --err: #f85149; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; padding: 15px; overflow: hidden; }
+
+        .top { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 10px 15px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 10px; }
+        select { background: #07090c; color: white; border: 1px solid var(--border); padding: 7px; border-radius: 4px; outline: none; }
+
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+
+        .spinbox { display: flex; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; height: 31px;}
+        .spin-btn { background: #111419; color: #8b949e; border: none; padding: 0 12px; cursor: pointer; font-weight: bold; border-radius: 0; margin: 0;}
+        .spin-btn:hover { background: #1f242c; color: white; }
+        .spinbox input { border: none; border-radius: 0; width: 45px; background: #07090c; color: white; text-align: center; font-weight: bold; outline: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border);}
+
+        button { background: var(--accent); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { filter: brightness(1.2); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-ref { background: #1f242c; padding: 8px 12px; margin-left: auto; border: 1px solid var(--border); }
+        .btn-ref:hover { background: #30363d; }
+
+        .auto-box { display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: var(--muted); font-weight: bold; margin-left: 10px; }
+        .auto-box input { accent-color: var(--accent); cursor: pointer; }
+        .auto-box:hover { color: white; }
+
+        .tiers-filter { display: flex; gap: 8px; margin-left: 15px; padding-left: 15px; border-left: 1px solid var(--border); }
+        .tier-lbl { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 13px; font-weight: bold; color: var(--muted); }
+        .tier-lbl input { accent-color: var(--accent); cursor: pointer; width: 16px; height: 16px; }
+        .tier-lbl:hover { color: white; }
+
+        .main { display: flex; flex: 1; gap: 10px; overflow: hidden; }
+
+        .tree { width: 230px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 10px; overflow-y: auto; }
+        .t-head { font-size: 10px; color: var(--accent); font-weight: bold; margin: 15px 0 5px 5px; text-transform: uppercase; }
+        .t-item { padding: 8px 10px; font-size: 12px; color: var(--muted); cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .t-item:hover { background: #1c2128; color: white; }
+        .t-item.active { background: rgba(137, 87, 229, 0.2); color: white; border-left: 2px solid var(--accent); font-weight: bold; }
+
+        .content { flex: 1; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; position: relative; overflow: hidden; }
+        .scroll { overflow-y: auto; height: 100%; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #161b22; color: var(--muted); padding: 12px; text-align: left; position: sticky; top: 0; font-size: 11px; z-index: 10; border-bottom: 2px solid #30363d; }
+        td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+
+        @keyframes fadeInRow {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        tr.anim-row { opacity: 0; animation: fadeInRow 0.3s ease forwards; }
+
+        .item { display: flex; align-items: center; gap: 12px; }
+        .icon { width: 48px; height: 48px; background: #07090c; border: 1px solid #30363d; border-radius: 6px; flex-shrink: 0; object-fit: contain; }
+
+        .p-win { color: var(--win); font-weight: bold; text-align: right; }
+        .p-loss { color: var(--err); font-weight: bold; text-align: right; }
+        .err-text { color: var(--err); font-weight: bold; }
+
+        .loader { position: absolute; inset: 0; background: rgba(13,17,23,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        .spin { width: 40px; height: 40px; border: 4px solid #333; border-top-color: var(--accent); border-radius: 50%; animation: s 1s linear infinite; margin-bottom: 10px; }
+        @keyframes s { to { transform: rotate(360deg); } }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0d1117; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8b949e; }
+        ::-webkit-scrollbar-corner { background: transparent; }
+    </style>
+</head>
+<body>
+
+    <div class="top">
+        <select id="b"><option>Martlock</option><option>Thetford</option><option>Fort Sterling</option><option>Lymhurst</option><option>Bridgewatch</option><option>Caerleon</option></select>
+        <span style="color:#444">➔</span>
+        <select id="s"><option>Black Market</option><option>Caerleon</option></select>
+        <span style="margin-left: 10px; font-size: 12px; color: var(--muted);">Мин %:</span>
+
+        <div class="spinbox">
+            <button class="spin-btn" onclick="adjP(-1)">-</button>
+            <input type="number" id="p" value="10" onchange="checkP(this)">
+            <button class="spin-btn" onclick="adjP(1)">+</button>
+        </div>
+
+        <div class="tiers-filter" id="tiers">
+            <label class="tier-lbl"><input type="checkbox" value="T4" checked> T4</label>
+            <label class="tier-lbl"><input type="checkbox" value="T5" checked> T5</label>
+            <label class="tier-lbl"><input type="checkbox" value="T6" checked> T6</label>
+            <label class="tier-lbl"><input type="checkbox" value="T7" checked> T7</label>
+            <label class="tier-lbl"><input type="checkbox" value="T8" checked> T8</label>
+        </div>
+
+        <label class="auto-box">
+            <input type="checkbox" id="auto_cb" onchange="toggleAuto()"> Авто (1 мин)
+        </label>
+
+        <button class="btn-ref" onclick="go()" title="Обновить сейчас">↻</button>
+        <button id="btn" style="margin-left: 5px;" onclick="go()">🚀 Поиск</button>
+    </div>
+
+    <div class="main">
+        <div class="tree">
+            <div class="t-item active" onclick="sel('ALL', this)">[ ВСЁ ]</div>
+
+            <div class="t-head">Доспехи</div>
+            <div class="t-item" onclick="sel('_PLATE', this)">Латные</div>
+            <div class="t-item" onclick="sel('_LEATHER', this)">Кожаные</div>
+            <div class="t-item" onclick="sel('_CLOTH', this)">Тканевые</div>
+
+            <div class="t-head">Оружие ближнего</div>
+            <div class="t-item" onclick="sel('MAIN_SWORD|2H_SWORD|CLAYMORE|CLEAVER|SCIMITAR|DUALSWORD', this)">Мечи (Все)</div>
+            <div class="t-item" onclick="sel('MAIN_AXE|2H_AXE|HALBERD|_SCYTHE|DUALAXE', this)">Топоры (Все)</div>
+            <div class="t-item" onclick="sel('MAIN_MACE|2H_MACE|FLAIL|MORNINGSTAR|ROCKMACE', this)">Булавы (Все)</div>
+            <div class="t-item" onclick="sel('MAIN_HAMMER|2H_HAMMER|POLEHAMMER|RAM', this)">Молоты</div>
+            <div class="t-item" onclick="sel('MAIN_DAGGER|2H_DAGGER|CLAW|BLOODLETTER|DUALDIRK', this)">Кинжалы</div>
+            <div class="t-item" onclick="sel('MAIN_SPEAR|2H_SPEAR|GLAIVE|TRIDENT|PIKE|LANCE', this)">Копья</div>
+            <div class="t-item" onclick="sel('QUARTERSTAFF|TWINSCYTHE|ROCKSTAFF|IRONSTAFF|COMBATSTAFF', this)">Шесты (Все)</div>
+            <div class="t-item" onclick="sel('KNUCKLES|GLOVES|CESTUS|FISTS', this)">Перчатки</div>
+
+            <div class="t-head">Оружие дальнего / Магия</div>
+            <div class="t-item" onclick="sel('2H_BOW|LONGBOW|WARBOW', this)">Луки</div>
+            <div class="t-item" onclick="sel('CROSSBOW', this)">Арбалеты</div>
+            <div class="t-item" onclick="sel('FIRESTAFF|HOLYSTAFF|NATURESTAFF|FROSTSTAFF|ARCANESTAFF|CURSEDSTAFF', this)">Посохи (Магия)</div>
+
+            <div class="t-head">Разное</div>
+            <div class="t-item" onclick="sel('SHIELD|BOOK|HORN|TORCH|TOTEM|CANE|ORB|LAMP|MUG', this)">Левая рука</div>
+            <div class="t-item" onclick="sel('CAPE|BAG', this)">Плащи/Сумки</div>
+        </div>
+
+        <div class="content">
+            <div id="ld" class="loader"><div class="spin"></div><div id="px" style="font-size:30px; font-weight:900; color:var(--accent)">0%</div></div>
+            <div class="scroll">
+                <table>
+                    <thead>
+                        <tr><th style="width: 40%;">Предмет</th><th style="width: 10%;">Качество</th><th style="text-align:right">Закуп</th><th style="text-align:right">Скупка ЧМ</th><th style="text-align:right">Профит</th></tr>
+                    </thead>
+                    <tbody id="out"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script>
+        var bridge = null; var tag = 'ALL'; var autoTimer = null; var renderTimer = null;
+        const nf = new Intl.NumberFormat('ru-RU');
+        const q_map = {1: "Обыч", 2: "Хор", 3: "Выд", 4: "Отл", 5: "Шед"};
+
+        window.onload = () => { if(typeof qt !== 'undefined') new QWebChannel(qt.webChannelTransport, (c) => { bridge = c.objects.backendBridge; }); };
+        window.setPct = (v) => { document.getElementById('px').innerText = v + "%"; };
+
+        function adjP(val) {
+            let p = document.getElementById('p'); let newVal = parseInt(p.value) + val;
+            if(newVal < -100) newVal = -100; p.value = newVal;
+        }
+        function checkP(el) { if(parseInt(el.value) < -100) el.value = -100; }
+
+        function toggleAuto() {
+            if(document.getElementById('auto_cb').checked) {
+                autoTimer = setInterval(() => { if(!document.getElementById('btn').disabled) go(); }, 60000);
+            } else {
+                clearInterval(autoTimer);
+            }
+        }
+
+        // БЕЗОТКАЗНЫЙ ЦИКЛ ОШИБОК КАРТИНОК
+        function imgErr(img, f_img) {
+            if (img.getAttribute('data-fail') === '2') {
+                img.onerror = null; // Отключаем цикл, если всё сломалось
+                return;
+            }
+            if (img.getAttribute('data-fail') === '1') {
+                img.setAttribute('data-fail', '2');
+                img.src = 'https://render.albiononline.com/v1/item/T1_TRASH.png'; // Последний шанс
+            } else {
+                img.setAttribute('data-fail', '1');
+                img.src = f_img; // Пробуем базу
+            }
+        }
+
+        window.render = (data) => {
+            if (renderTimer) clearTimeout(renderTimer);
+
+            const out = document.getElementById('out');
+            out.innerHTML = "";
+
+            if (data.length === 0) {
+                out.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px; color: var(--muted);'>Ничего не найдено.</td></tr>";
+                hideLoader(); return;
+            }
+
+            let index = 0;
+            const chunkSize = 15;
+
+            function renderChunk() {
+                let limit = Math.min(index + chunkSize, data.length);
+
+                for (; index < limit; index++) {
+                    let i = data[index];
+                    const tr = document.createElement('tr');
+                    tr.className = "anim-row";
+                    tr.style.animationDelay = `${(index % chunkSize) * 0.02}s`;
+
+                    const bp = i.bp || 0;
+                    const sp = i.sp || 0;
+                    const s = i.s || 0;
+                    const p = i.p || 0;
+
+                    const bp_html = bp > 0 ? nf.format(bp) : `<span class="err-text">Нет цены</span>`;
+                    const sp_html = sp > 0 ? nf.format(sp) : `<span class="err-text">Нет цены</span>`;
+
+                    let profit_html = "";
+                    if (bp > 0 && sp > 0) {
+                        const isProfitable = s > 0;
+                        const sign = isProfitable ? '+' : '';
+                        const colorClass = isProfitable ? 'p-win' : 'p-loss';
+                        profit_html = `<td class="${colorClass}">${sign}${nf.format(s)}<br><small>(${sign}${p.toFixed(1)}%)</small></td>`;
+                    } else {
+                        profit_html = `<td style="text-align:right; color:var(--muted)">Неизвестно<br><small>(Ожидает данных API)</small></td>`;
+                    }
+
+                    tr.innerHTML = `
+                        <td>
+                            <div class="item">
+                                <img src="${i.img}" class="icon" loading="lazy" onerror="imgErr(this, '${i.f_img}')">
+                                <div>
+                                    <b style="font-size: 14px; color: white;">${i.n}</b><br>
+                                    <small style="color:var(--muted)">${i.id}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${q_map[i.q] || i.q}</td>
+                        <td style="text-align:right; color:var(--muted)">${bp_html}</td>
+                        <td style="text-align:right; font-weight:bold">${sp_html}</td>
+                        ${profit_html}
+                    `;
+                    out.appendChild(tr);
+                }
+
+                if (index < data.length) {
+                    renderTimer = setTimeout(renderChunk, 20);
+                } else {
+                    hideLoader();
+                }
+            }
+
+            renderChunk();
+        };
+
+        window.hideLoader = () => {
+            document.getElementById('ld').style.display='none';
+            document.getElementById('btn').disabled=false;
+        };
+
+        function go() {
+            if(!bridge) return;
+            if (renderTimer) clearTimeout(renderTimer);
+
+            const activeTiers = Array.from(document.querySelectorAll('#tiers input:checked')).map(cb => cb.value).join('|');
+            if(!activeTiers) { alert("Выберите хотя бы один Тир!"); return; }
+
+            document.getElementById('ld').style.display='flex';
+            document.getElementById('btn').disabled=true;
+            document.getElementById('px').innerText = "0%";
+
+            bridge.start_scan(
+                document.getElementById('b').value,
+                document.getElementById('s').value,
+                parseFloat(document.getElementById('p').value),
+                tag,
+                activeTiers
+            );
+        }
+
+        function sel(t, el) {
+            tag = t;
+            document.querySelectorAll('.t-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            go();
+        }
+    </script>
+</body>
+</html>

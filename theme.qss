@@ -1,0 +1,170 @@
+/* ================= ГЛОБАЛЬНЫЕ СТИЛИ ================= */
+QMainWindow, QDialog {
+    background-color: #0a0c10;
+    border: 1px solid #1f242c;
+    border-radius: 8px;
+}
+QFrame {
+    border: none;
+    background: transparent;
+}
+QLabel {
+    color: #e6edf3;
+    font-family: 'Segoe UI', sans-serif;
+    background: transparent;
+}
+QLineEdit {
+    background: #07090c;
+    color: white;
+    border: 1px solid #1f242c;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 14px;
+}
+QLineEdit:focus {
+    border: 1px solid #00a3ff;
+    background: #0d1117;
+}
+QCheckBox {
+    color: #e6edf3;
+    font-weight: bold;
+    font-size: 13px;
+    spacing: 8px;
+}
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 2px solid #30363d;
+    background: #07090c;
+}
+QCheckBox::indicator:hover {
+    border: 2px solid #00a3ff;
+}
+QCheckBox::indicator:checked {
+    background: #00a3ff;
+    border: 2px solid #00a3ff;
+}
+
+/* ================= ФИКС ВЫПАДАЮЩИХ СПИСКОВ ================= */
+QComboBox {
+    background: #07090c;
+    color: white;
+    border: 1px solid #1f242c;
+    border-radius: 4px;
+    padding: 5px 10px;
+}
+QComboBox::drop-down {
+    border: none;
+    background: transparent;
+    width: 25px;
+}
+QComboBox::down-arrow {
+    image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+QComboBox QAbstractItemView {
+    background-color: #07090c;
+    color: white;
+    selection-background-color: #1f242c;
+    border: 1px solid #30363d;
+}
+
+/* ================= БОКОВОЕ МЕНЮ И ВКЛАДКИ ================= */
+#SidebarItem {
+    color: #8b949e;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-left: 3px solid transparent;
+    text-align: left;
+    padding: 15px 20px;
+    margin: 2px 0px;
+    background: transparent;
+}
+#SidebarItem:hover {
+    background-color: #161b22;
+    color: #f0f6fc;
+}
+#SidebarItem[active='true'] {
+    background-color: #111419;
+    color: #00a3ff;
+    border-left: 3px solid #00a3ff;
+}
+
+QTabBar::tab {
+    background: #07090c;
+    color: #8b949e;
+    padding: 10px 20px;
+    border: 1px solid #1f242c;
+    border-right: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-weight: bold;
+    font-size: 13px;
+    min-width: 100px;
+}
+QTabBar::tab:selected {
+    background: #111419;
+    color: #e6edf3;
+    border-color: #30363d;
+    border-bottom: 2px solid #00a3ff;
+}
+QTabBar::tab:hover:!selected {
+    background: #161b22;
+    color: #c9d1d9;
+}
+QTabWidget::pane {
+    border: 1px solid #30363d;
+    top: -1px;
+    background: #111419;
+    border-radius: 4px;
+    border-top-left-radius: 0px;
+}
+
+/* ================= ИСПРАВЛЕНИЕ БЕЛОГО ФОНА В ОКНАХ И ДЕРЕВЬЯХ ================= */
+QListWidget, QScrollArea, QScrollArea > QWidget > QWidget {
+    background: transparent;
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+QAbstractScrollArea::corner {
+    background: #0a0c10;
+    border: none;
+}
+
+/* ФИКС ДЕРЕВА РЕСУРСОВ (УБИРАЕМ БЕЛЫЕ КВАДРАТЫ) */
+QTreeView {
+    show-decoration-selected: 0;
+}
+QTreeView::branch {
+    background: transparent;
+}
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+    image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'/%3E%3C/svg%3E");
+}
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings {
+    image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+/* ================= КРАСИВЫЕ СКРОЛЛБАРЫ ================= */
+QScrollBar:vertical {
+    background: #07090c; width: 10px; margin: 0px; border-left: 1px solid #1f242c;
+}
+QScrollBar::handle:vertical {
+    background: #1f242c; min-height: 20px; border-radius: 5px; margin: 2px;
+}
+QScrollBar::handle:vertical:hover { background: #00a3ff; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
+QScrollBar:horizontal {
+    background: #07090c; height: 10px; margin: 0px; border-top: 1px solid #1f242c;
+}
+QScrollBar::handle:horizontal {
+    background: #1f242c; min-width: 20px; border-radius: 5px; margin: 2px;
+}
+QScrollBar::handle:horizontal:hover { background: #00a3ff; }
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal { width: 0px; }
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }
